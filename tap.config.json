@@ -1,0 +1,5 @@
+{
+  "project_id": "59c42fbb-8df0-4358-ad04-233d3f92fbad",
+  "tap_api_url": "",
+  "note": "Used by fetch-credentials.js to pull credentials from TAP backend"
+}
