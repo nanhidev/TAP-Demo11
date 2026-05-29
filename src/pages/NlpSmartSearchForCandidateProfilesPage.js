@@ -1,7 +1,7 @@
-// src/pages/LoginScreenForRecruitersPage.js
+// src/pages/NlpSmartSearchForCandidateProfilesPage.js
 const { expect } = require('@playwright/test');
 
-class LoginScreenForRecruitersPage {
+class NlpSmartSearchForCandidateProfilesPage {
   constructor(page) {
     this.page = page;
   }
@@ -69,19 +69,31 @@ class LoginScreenForRecruitersPage {
   }
 
   async verifyLoginError() {
-    await expect(this.page.locator('*').filter({ hasText: /error|invalid|incorrect|failed|wrong/i }).first())
-      .toBeVisible({ timeout: 10000 });
+    await expect(this.page.locator('*').filter({ hasText: /error|invalid|incorrect|failed|wrong/i }).first()).toBeVisible({ timeout: 10000 });
   }
 
-  async checkShowHidePassword() {
-    const toggleBtn = this.page.locator('button:has-text("Show/Hide Password")').first();
-    await toggleBtn.waitFor({ state: 'attached', timeout: 15000 });
-    await toggleBtn.scrollIntoViewIfNeeded();
-    await toggleBtn.waitFor({ state: 'visible', timeout: 15000 });
-    await toggleBtn.click();
-    await this.page.locator('input[type="password"]').waitFor({ state: 'visible', timeout: 15000 });
-    await toggleBtn.click();
+  async searchCandidates(query) {
+    const searchInput = this.page.locator('input[placeholder*="search"], textarea[placeholder*="search"]').first();
+    await searchInput.waitFor({ state: 'attached', timeout: 15000 });
+    await searchInput.scrollIntoViewIfNeeded();
+    await searchInput.waitFor({ state: 'visible', timeout: 15000 });
+    await searchInput.fill(query);
+    
+    const searchButton = this.page.locator('button:has-text("Search"), [role="button"]:has-text("Search")').first();
+    await searchButton.waitFor({ state: 'attached', timeout: 15000 });
+    await searchButton.scrollIntoViewIfNeeded();
+    await searchButton.waitFor({ state: 'visible', timeout: 15000 });
+    await searchButton.click();
+    await this.waitForNetworkIdle();
+  }
+
+  async checkNoProfilesFound() {
+    await expect(this.page.locator('*').filter({ hasText: /no profiles found/i }).first()).toBeVisible({ timeout: 10000 });
+  }
+
+  async checkCandidateProfiles() {
+    await expect(this.page.locator('.candidate-profile-card').first()).toBeVisible({ timeout: 10000 });
   }
 }
 
-module.exports = LoginScreenForRecruitersPage;
+module.exports = NlpSmartSearchForCandidateProfilesPage;
