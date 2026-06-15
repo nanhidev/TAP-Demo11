@@ -1,7 +1,7 @@
-// src/pages/NlpSmartSearchForCandidateProfilesPage.js
+// src/pages/LoginScreenForRecruitersPage.js
 const { expect } = require('@playwright/test');
 
-class NlpSmartSearchForCandidateProfilesPage {
+class LoginScreenForRecruitersPage {
   constructor(page) {
     this.page = page;
   }
@@ -69,31 +69,27 @@ class NlpSmartSearchForCandidateProfilesPage {
   }
 
   async verifyLoginError() {
-    await expect(this.page.locator('*').filter({ hasText: /error|invalid|incorrect|failed|wrong/i }).first()).toBeVisible({ timeout: 10000 });
+    await expect(this.page.locator('*').filter({ hasText: /error|invalid|incorrect|failed|wrong/i }).first())
+      .toBeVisible({ timeout: 10000 });
   }
 
-  async searchCandidates(query) {
-    const searchInput = this.page.locator('input[placeholder*="search"], textarea[placeholder*="search"]').first();
-    await searchInput.waitFor({ state: 'attached', timeout: 15000 });
-    await searchInput.scrollIntoViewIfNeeded();
-    await searchInput.waitFor({ state: 'visible', timeout: 15000 });
-    await searchInput.fill(query);
-    
-    const searchButton = this.page.locator('button:has-text("Search"), [role="button"]:has-text("Search")').first();
-    await searchButton.waitFor({ state: 'attached', timeout: 15000 });
-    await searchButton.scrollIntoViewIfNeeded();
-    await searchButton.waitFor({ state: 'visible', timeout: 15000 });
-    await searchButton.click();
-    await this.waitForNetworkIdle();
-  }
+  async checkShowHidePassword() {
+    const passwordField = this.page.locator('input[type="password"], input[name="password"], [placeholder*="password" i]').first();
+    await passwordField.waitFor({ state: 'attached', timeout: 15000 });
+    await passwordField.scrollIntoViewIfNeeded();
+    await passwordField.waitFor({ state: 'visible', timeout: 15000 });
+    await passwordField.fill('P@ssw0rd123');
 
-  async checkNoProfilesFound() {
-    await expect(this.page.locator('*').filter({ hasText: /no profiles found/i }).first()).toBeVisible({ timeout: 10000 });
-  }
+    const toggleBtn = this.page.locator('button:has-text("Show/Hide Password")').first();
+    await toggleBtn.waitFor({ state: 'attached', timeout: 15000 });
+    await toggleBtn.scrollIntoViewIfNeeded();
+    await toggleBtn.waitFor({ state: 'visible', timeout: 15000 });
+    await toggleBtn.click();
 
-  async checkCandidateProfiles() {
-    await expect(this.page.locator('.candidate-profile-card').first()).toBeVisible({ timeout: 10000 });
+    await expect(passwordField).toHaveAttribute('type', 'text');
+    await toggleBtn.click();
+    await expect(passwordField).toHaveAttribute('type', 'password');
   }
 }
 
-module.exports = NlpSmartSearchForCandidateProfilesPage;
+module.exports = LoginScreenForRecruitersPage;
